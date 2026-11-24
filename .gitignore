@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+
+# Local SQLite databases (Keep repo clean, DBs are created on startup)
+data/uat/*.sqlite-wal
+data/uat/*.sqlite-shm
+data/prod/*.sqlite-wal
+data/prod/*.sqlite-shm
+
+# Environment overrides & secret keys
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db

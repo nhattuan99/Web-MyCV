@@ -1,0 +1,24 @@
+{
+  "name": "cv-backend-api",
+  "version": "1.0.0",
+  "description": "Enterprise Grade CV Backend API with Dual UAT/Production Support",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev:uat": "node -r dotenv/config server.js dotenv_config_path=.env.uat",
+    "dev:prod": "node -r dotenv/config server.js dotenv_config_path=.env.production",
+    "migrate:uat": "node database/migrate.js --env=uat",
+    "migrate:prod": "node database/migrate.js --env=prod",
+    "seed:uat": "node database/seed.js --env=uat",
+    "seed:prod": "node database/seed.js --env=prod"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.3.1",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0"
+  }
+}

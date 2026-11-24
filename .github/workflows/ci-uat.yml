@@ -1,0 +1,44 @@
+name: UAT CI/CD Pipeline
+
+on:
+  push:
+    branches: [ develop, 'release/*' ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  test-and-build:
+    name: Build, Lint & Verify Staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install & Audit Backend Dependencies
+        run: |
+          cd server
+          npm ci
+          node -e "require('./config')"
+
+      - name: Install & Build Frontend (UAT Mode)
+        run: |
+          cd client
+          npm ci
+          npm run build -- --mode uat
+
+      - name: Build UAT Docker Containers
+        run: |
+          docker compose -f deploy/docker/docker-compose.uat.yml build
+
+      - name: Deploy to UAT Server
+        if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release/')
+        run: |
+          echo "🚀 Deploying automatically to UAT server (uat.domain.com)..."
+          # Example: rsync or docker-compose up -d on staging server via SSH

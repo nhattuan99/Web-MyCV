@@ -1,0 +1,49 @@
+# ==============================================================================
+# Docker Compose: UAT / Staging Environment
+# Isolated Network, Separate UAT Database Volume, Debug Logging Enabled
+# ==============================================================================
+version: '3.8'
+
+services:
+  backend-uat:
+    build:
+      context: ../../server
+      dockerfile: ../deploy/docker/Dockerfile.backend
+    container_name: cv-backend-uat
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=uat
+      - PORT=4001
+      - DB_PATH=/app/data/uat/cv_uat.sqlite
+      - CORS_ORIGIN=http://localhost:3001
+      - LOG_LEVEL=debug
+      - ENABLE_TEST_TOOLS=true
+    ports:
+      - "4001:4001"
+    volumes:
+      - uat_data:/app/data/uat
+    networks:
+      - uat-network
+
+  frontend-uat:
+    build:
+      context: ../../client
+      dockerfile: ../deploy/docker/Dockerfile.frontend
+      args:
+        - BUILD_MODE=uat
+    container_name: cv-frontend-uat
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend-uat
+    networks:
+      - uat-network
+
+volumes:
+  uat_data:
+    driver: local
+
+networks:
+  uat-network:
+    driver: bridge

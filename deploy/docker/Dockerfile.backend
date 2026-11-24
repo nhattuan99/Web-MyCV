@@ -1,0 +1,27 @@
+# ==============================================================================
+# Enterprise Backend Dockerfile
+# Multi-stage, Non-root User, Security Hardened
+# ==============================================================================
+FROM node:24-alpine AS base
+
+WORKDIR /app
+
+# Install dependencies in a clean layer
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy source code
+COPY . .
+
+# Ensure data directories exist and set ownership to node user
+RUN mkdir -p /app/data/uat /app/data/prod && chown -R node:node /app
+
+# Switch to non-root user for enterprise container security
+USER node
+
+EXPOSE 4000 4001
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:4000/api/health || wget --no-verbose --tries=1 --spider http://localhost:4001/api/health || exit 1
+
+CMD ["node", "server.js"]

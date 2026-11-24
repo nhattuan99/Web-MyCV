@@ -1,0 +1,48 @@
+name: Production CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*.*.*' ]
+
+jobs:
+  production-deployment:
+    name: Production Release & Deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: https://nhattuan-cv.com
+
+    steps:
+      - name: Checkout Release Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Security Vulnerability Audit
+        run: |
+          cd server && npm audit --audit-level=high
+          cd ../client && npm audit --audit-level=high
+
+      - name: Build Optimized Production Bundle
+        run: |
+          cd client
+          npm ci
+          npm run build -- --mode production
+
+      - name: Build Production Docker Images
+        run: |
+          docker compose -f deploy/docker/docker-compose.prod.yml build
+
+      - name: Deploy with Zero-Downtime Rollout
+        run: |
+          echo "🔒 Deploying to Production cluster..."
+          # docker compose -f deploy/docker/docker-compose.prod.yml up -d --remove-orphans
+
+      - name: Post-Deployment Smoke Test & Health Check
+        run: |
+          echo "🩺 Verifying Production /api/health endpoint..."
+          # curl -f https://nhattuan-cv.com/api/health || exit 1

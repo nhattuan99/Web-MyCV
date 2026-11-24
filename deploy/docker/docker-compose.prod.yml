@@ -1,0 +1,54 @@
+# ==============================================================================
+# Docker Compose: Production Environment
+# High Security, Isolated Production Database, Strict Restart Policy
+# ==============================================================================
+version: '3.8'
+
+services:
+  backend-prod:
+    build:
+      context: ../../server
+      dockerfile: ../deploy/docker/Dockerfile.backend
+    container_name: cv-backend-prod
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - DB_PATH=/app/data/prod/cv_prod.sqlite
+      - CORS_ORIGIN=http://localhost:3000,https://nhattuan-cv.com
+      - LOG_LEVEL=info
+      - ENABLE_TEST_TOOLS=false
+    ports:
+      - "4000:4000"
+    volumes:
+      - prod_data:/app/data/prod
+    networks:
+      - prod-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  frontend-prod:
+    build:
+      context: ../../client
+      dockerfile: ../deploy/docker/Dockerfile.frontend
+      args:
+        - BUILD_MODE=production
+    container_name: cv-frontend-prod
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend-prod
+    networks:
+      - prod-network
+
+volumes:
+  prod_data:
+    driver: local
+
+networks:
+  prod-network:
+    driver: bridge

@@ -1,0 +1,28 @@
+{
+  "name": "web-mycv-enterprise",
+  "version": "1.0.0",
+  "description": "Enterprise-grade CV Web Architecture for Le Quang Nhat Tuan with Dual UAT & Production Environments",
+  "scripts": {
+    "dev:uat": "node scripts/dev-uat.js",
+    "dev:prod": "node scripts/dev-prod.js",
+    "server:uat": "cd server && npm run dev:uat",
+    "server:prod": "cd server && npm run dev:prod",
+    "client:uat": "cd client && npm run dev:uat",
+    "client:prod": "cd client && npm run dev:prod",
+    "build": "cd client && npm run build",
+    "migrate:uat": "cd server && npm run migrate:uat",
+    "migrate:prod": "cd server && npm run migrate:prod",
+    "seed:uat": "cd server && npm run seed:uat",
+    "seed:prod": "cd server && npm run seed:prod"
+  },
+  "keywords": [
+    "cv",
+    "portfolio",
+    "enterprise-architecture",
+    "uat-production-separation",
+    "it-helpdesk",
+    "network-engineer"
+  ],
+  "author": "Le Quang Nhat Tuan",
+  "license": "ISC"
+}
